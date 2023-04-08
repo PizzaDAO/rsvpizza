@@ -50,6 +50,10 @@ A 3rd party authentication provider, enabling multiple authentication methods. F
 
 3rd party hosted serverless logging. Better searchability and other features than the standard logging provided by Vercel.
 
+- [Upstash](https://upstash.com/)
+
+Serverless solution for Redis and Kafka. Add if required.
+
 Also configured to use Prettier along with ESLint for linting. Makefile not yet working, but will be set up to provide convenience alternatives to package.json scripts which are abstracted away from the specific tool invocations.
 
 ## Learn More
