@@ -18,5 +18,11 @@ const config = {
     locales: ["en"],
     defaultLocale: "en",
   },
+  images: {
+    domains: [
+      // Your other allowed domains
+      "images.clerk.dev",
+    ],
+  },
 };
 export default config;

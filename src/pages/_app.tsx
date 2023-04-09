@@ -5,7 +5,6 @@ import { api } from '~/utils/api';
 import { ChakraProvider, GlobalStyle } from '@chakra-ui/react';
 import theme from '../theme';
 
-import '~/styles/globals.css';
 import { ClerkProvider } from '@clerk/nextjs';
 
 const MyApp: AppType = ({ Component, pageProps }) => {
