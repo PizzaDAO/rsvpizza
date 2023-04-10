@@ -61,7 +61,7 @@ const Home: NextPage = () => {
 									top={2}
 									right={2}
 								>
-									{event.date.toDateString()}
+									{event.datetime.toDateString()}
 								</Text>
 								<Text as={'u'} fontSize={'2xl'} fontWeight={'bold'}>
 									{event.name}

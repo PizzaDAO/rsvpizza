@@ -58,7 +58,7 @@ export const eventsRouter = createTRPCRouter({
 					creatorId,
 					name: input.name,
 					description: input.description,
-					date: input.datetime,
+					datetime: input.datetime,
 					location: input.location,
 					attendees: input.attendees,
 					slug: input.slug,
