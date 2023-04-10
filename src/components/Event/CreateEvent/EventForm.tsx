@@ -1,5 +1,4 @@
-// components/EventForm.tsx
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
 	Box,
 	Button,
@@ -37,12 +36,18 @@ export const EventForm: React.FC<EventFormProps> = ({ onSubmit }) => {
 		register,
 		control,
 		handleSubmit,
+		setValue,
 		formState: { errors, isSubmitting },
 	} = useForm<EventFormData>({
 		resolver: zodResolver(EventFormSchema),
 	});
 
 	const [location, setLocation] = useState('');
+
+	useEffect(() => {
+		setValue('location', location);
+	}, [location, setValue]);
+
 	const toast = useToast();
 
 	const handleLocationSelect = (address: string) => {
@@ -50,6 +55,8 @@ export const EventForm: React.FC<EventFormProps> = ({ onSubmit }) => {
 	};
 
 	const onFormSubmit = async (data: EventFormData) => {
+		// Parse the datetime string into a Date object
+		data.datetime = new Date(data.datetime);
 		// Add a success toast notification
 		toast({
 			title: 'Event created.',
@@ -71,7 +78,12 @@ export const EventForm: React.FC<EventFormProps> = ({ onSubmit }) => {
 				<GridItem colSpan={{ base: 1, md: 2 }}>
 					<FormControl isInvalid={!!errors.name}>
 						<FormLabel htmlFor='name'>Event Name</FormLabel>
-						<Input id='name' {...register('name')} />
+						<Input
+							id='name'
+							{...register('name')}
+							bg='gray.700'
+							color='white'
+						/>
 						<FormErrorMessage>{errors.name?.message}</FormErrorMessage>
 					</FormControl>
 				</GridItem>
@@ -83,6 +95,8 @@ export const EventForm: React.FC<EventFormProps> = ({ onSubmit }) => {
 							type='datetime-local'
 							id='datetime'
 							{...register('datetime')}
+							bg='gray.700'
+							color='white'
 						/>
 						<FormErrorMessage>{errors.datetime?.message}</FormErrorMessage>
 					</FormControl>
@@ -103,7 +117,11 @@ export const EventForm: React.FC<EventFormProps> = ({ onSubmit }) => {
 								loading,
 							}) => (
 								<Box>
-									<Input {...getInputProps({ id: 'location' })} />
+									<Input
+										{...getInputProps({ id: 'location' })}
+										bg='gray.700'
+										color='white'
+									/>
 									<Box position='absolute' zIndex='10' width='100%' mt={1}>
 										{loading && <div>Loading...</div>}
 										{suggestions.map((suggestion) => (
@@ -130,7 +148,12 @@ export const EventForm: React.FC<EventFormProps> = ({ onSubmit }) => {
 					<FormControl isInvalid={!!errors.attendees}>
 						<FormLabel htmlFor='attendees'>Number of Attendees</FormLabel>
 						<NumberInput defaultValue={0} min={0}>
-							<NumberInputField id='attendees' {...register('attendees')} />
+							<NumberInputField
+								id='attendees'
+								{...register('attendees')}
+								bg='gray.700'
+								color='white'
+							/>
 							<NumberInputStepper>
 								<NumberIncrementStepper />
 								<NumberDecrementStepper />
@@ -143,7 +166,12 @@ export const EventForm: React.FC<EventFormProps> = ({ onSubmit }) => {
 				<GridItem colSpan={{ base: 1, md: 2 }}>
 					<FormControl isInvalid={!!errors.description}>
 						<FormLabel htmlFor='description'>Description</FormLabel>
-						<Textarea id='description' {...register('description')} />
+						<Textarea
+							id='description'
+							{...register('description')}
+							bg='gray.700'
+							color='white'
+						/>
 						<FormErrorMessage>{errors.description?.message}</FormErrorMessage>
 					</FormControl>
 				</GridItem>
@@ -155,6 +183,10 @@ export const EventForm: React.FC<EventFormProps> = ({ onSubmit }) => {
 					type='submit'
 					isLoading={isSubmitting}
 					loadingText='Submitting'
+					bg='gray.700'
+					color='white'
+					_hover={{ bg: 'gray.600' }}
+					_active={{ bg: 'gray.800' }}
 				>
 					Create Event
 				</Button>

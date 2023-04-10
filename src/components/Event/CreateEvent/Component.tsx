@@ -28,7 +28,7 @@ const CreateEvent: NextPage = () => {
 			position={'relative'}
 			flexDirection={'row'}
 			justifyContent={'flex-start'}
-			bgColor={'red.500'}
+			bgColor={'blue.500'}
 			w={'500px'}
 		>
 			<Flex position={'absolute'} top={'0'} left={'0'}>
