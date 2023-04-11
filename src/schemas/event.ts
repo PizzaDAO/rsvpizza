@@ -1,20 +1,20 @@
 import { z } from 'zod';
+import { datetimeSchema } from './utils';
 
-const dateStringSchema = z.string().refine(
-	(value) => {
-		try {
-			new Date(value);
-			return true;
-		} catch {
-			return false;
-		}
-	},
-	{
-		message: 'Invalid date format',
-	}
-);
+export const EventSchema = z.object({
+	id: z.string(),
+	creatorId: z.string(),
+	createdAt: z.date(),
+	updatedAt: z.date(),
+	name: z.string(),
+	datetime: z.date(),
+	location: z.string(),
+	slug: z.string(),
+	attendees: z.number(),
+	description: z.string(),
+});
 
-const datetimeSchema = dateStringSchema.transform((value) => new Date(value));
+export type Event = z.infer<typeof EventSchema>;
 
 export const EventFormSchema = z.object({
 	name: z.string().nonempty({ message: 'Please enter an event name.' }),

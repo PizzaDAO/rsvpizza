@@ -1,6 +1,7 @@
 import type { User } from '@clerk/nextjs/dist/api';
 import { clerkClient } from '@clerk/nextjs/server';
 import { z } from 'zod';
+import { EventSchema } from '~/schemas/event';
 
 import {
 	createTRPCRouter,
@@ -8,16 +9,8 @@ import {
 	publicProcedure,
 } from '~/server/api/trpc';
 
-const filterUserForClient = (user: User) => {
-	return {
-		id: user.id,
-		username: user.username,
-		profileImageUrl: user.profileImageUrl,
-	};
-};
-
 export const eventsRouter = createTRPCRouter({
-	getAll: publicProcedure.query(async ({ ctx }) => {
+	getAll: privateProcedure.query(async ({ ctx }) => {
 		const events = await ctx.prisma.event.findMany({
 			take: 100,
 			where: {
@@ -27,14 +20,9 @@ export const eventsRouter = createTRPCRouter({
 			},
 		});
 
-		const users = (
-			await clerkClient.users.getUserList({
-				userId: events.map((event) => event.creatorId),
-				limit: 100,
-			})
-		).map(filterUserForClient);
+		const validatedEvents = events.map((event) => EventSchema.parse(event));
 
-		return events;
+		return validatedEvents;
 	}),
 
 	create: privateProcedure
@@ -67,73 +55,4 @@ export const eventsRouter = createTRPCRouter({
 
 			return event;
 		}),
-	/*getOne: publicProcedure.query(({ ctx, input }) => {
-		return ctx.prisma.event.findUnique({
-			where: {
-				id: input.id,
-			},
-		});
-	}),
-	create: publicProcedure.mutation({
-    input: z.object({
-      name: z.string(),
-      description: z.string(),
-      date: z.string(),
-      time: z.string(),
-      location: z.string(),
-      image: z.string(),
-    }),
-    resolve: async ({ ctx, input }) => {
-      return ctx.prisma.event.create({
-        data: {
-          name: input.name,
-          description: input.description,
-          date: input.date,
-          time: input.time,
-          location: input.location,
-          image: input.image,
-        },
-      });
-    }
-  }),
-
-  update: publicProcedure.mutation({
-    input: z.object({
-      id: z.number(),
-      name: z.string(),
-      description: z.string(),
-      date: z.string(),
-      time: z.string(),
-      location: z.string(),
-      image: z.string(),
-    }),
-    resolve: async ({ ctx, input }) => {
-      return ctx.prisma.event.update({
-        where: {
-          id: input.id,
-        },
-        data: {
-          name: input.name,
-          description: input.description,
-          date: input.date,
-          time: input.time,
-          location: input.location,
-          image: input.image,
-        },
-      });
-    }
-  }),
-
-  delete: publicProcedure.mutation({
-    input: z.object({
-      id: z.number(),
-    }),
-    resolve: async ({ ctx, input }) => {
-      return ctx.prisma.event.delete({
-        where: {
-          id: input.id,
-        },
-      });
-    }
-  }), */
 });
