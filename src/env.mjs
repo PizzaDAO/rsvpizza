@@ -7,6 +7,7 @@ import { z } from "zod";
 const server = z.object({
   DATABASE_URL: z.string().url(),
   NODE_ENV: z.enum(["development", "test", "production"]),
+  GOOGLE_MAPS_API_KEY: z.string().min(1),
 });
 
 /**
@@ -15,6 +16,7 @@ const server = z.object({
  */
 const client = z.object({
   // NEXT_PUBLIC_CLIENTVAR: z.string().min(1),
+  GOOGLE_MAPS_API_KEY: z.string().min(1),
 });
 
 /**
@@ -26,6 +28,7 @@ const client = z.object({
 const processEnv = {
   DATABASE_URL: process.env.DATABASE_URL,
   NODE_ENV: process.env.NODE_ENV,
+  GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY,
   // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
 };
 
