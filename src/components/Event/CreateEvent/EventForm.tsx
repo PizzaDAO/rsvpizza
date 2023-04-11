@@ -17,14 +17,10 @@ import {
 	Grid,
 	GridItem,
 } from '@chakra-ui/react';
-import ReactDatetime from 'react-datetime';
-import PlacesAutocomplete, {
-	geocodeByAddress,
-	getLatLng,
-} from 'react-places-autocomplete';
-import { useForm, Controller } from 'react-hook-form';
+import PlacesAutocomplete from 'react-places-autocomplete';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { EventFormSchema, EventFormData } from './EventSchema';
+import { EventFormSchema, EventFormData } from '~/schemas';
 import 'react-datetime/css/react-datetime.css';
 
 interface EventFormProps {
@@ -38,6 +34,7 @@ export const EventForm: React.FC<EventFormProps> = ({ onSubmit }) => {
 		handleSubmit,
 		setValue,
 		formState: { errors, isSubmitting },
+		reset,
 	} = useForm<EventFormData>({
 		resolver: zodResolver(EventFormSchema),
 	});
@@ -67,6 +64,10 @@ export const EventForm: React.FC<EventFormProps> = ({ onSubmit }) => {
 		});
 
 		onSubmit(data);
+
+		// Clear the form and location state
+		reset();
+		setLocation('');
 	};
 
 	return (

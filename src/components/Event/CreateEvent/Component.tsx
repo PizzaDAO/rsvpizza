@@ -1,13 +1,13 @@
 import { Box, Flex, Heading, VStack } from '@chakra-ui/react';
 import { NextPage } from 'next';
 import { EventForm } from './EventForm';
-import { EventFormData } from './EventSchema';
+import { EventFormData } from '~/schemas';
 import { useUser } from '@clerk/nextjs';
 import Image from 'next/image';
 import { api } from '~/utils/api';
 import generateUniqueSlug from '~/utils/generateUniqueSlug';
 
-const CreateEvent: NextPage = () => {
+export const CreateEvent: NextPage = () => {
 	const { user } = useUser();
 	console.log(user);
 	if (!user) {
