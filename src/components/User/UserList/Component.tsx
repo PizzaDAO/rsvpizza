@@ -28,7 +28,7 @@ export const UserList: FC<UserListProps> = ({ users, isLoading, isError }) => {
 		<>
 			{users && (
 				<TableContainer>
-					<Table variant='striped' colorScheme='teal'>
+					<Table variant='striped' colorScheme='slate'>
 						<TableCaption>Platform Native Users</TableCaption>
 						<Thead>
 							<Tr>
