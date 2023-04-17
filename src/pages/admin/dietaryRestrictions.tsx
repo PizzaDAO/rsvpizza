@@ -14,17 +14,13 @@ export const DietaryRestrictions: NextPage = () => {
 		isError: checkAdminError,
 	} = api.users.isAdmin.useQuery(undefined, { enabled: user.isSignedIn });
 
-	const { data, isLoading, isError } = api.dietaryRestrictions.getAll.useQuery(
-		undefined,
-		{
-			enabled: user.isSignedIn && isAdmin,
-		}
-	);
+	const { data, isLoading, isError } =
+		api.dietaryRestrictions.getAll.useQuery();
 
 	return (
 		<>
 			<Head>
-				<title>Admin - Users</title>
+				<title>Admin - Dietary Restrictions</title>
 				<meta name='description' content='' />
 			</Head>
 			<Flex
@@ -41,12 +37,22 @@ export const DietaryRestrictions: NextPage = () => {
 						</Box>
 					</>
 				) : !user.isSignedIn ? (
-					<SignInButton />
+					<>
+						<Text>
+							You must be signed in and a system admin to add new dietary
+							restriction types. If you should be a system admin, contact the
+							pizza mafia to be added
+						</Text>
+						<SignInButton />
+					</>
 				) : (
-					<Text>
-						You must be a system admin to add new dietary restriction types. If
-						you should be, contact the pizza mafia to be added
-					</Text>
+					<>
+						<Text>
+							You must be a system admin to add new dietary restriction types.
+							If you should be, contact the pizza mafia to be added
+						</Text>
+						<SignOutButton />
+					</>
 				)}
 				<Spacer mb={8} />
 				<VStack spacing={6} alignItems='center' flexGrow={1}>

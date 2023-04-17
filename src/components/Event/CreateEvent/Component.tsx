@@ -10,18 +10,16 @@ import {
 import { FC, useEffect, useRef, useState } from 'react';
 import { EventForm } from './EventForm';
 import { EventFormData } from '~/schemas';
-import { useUser } from '@clerk/nextjs';
+import { User } from '@clerk/clerk-sdk-node';
 import Image from 'next/image';
 import { api } from '~/utils/api';
 import MapWrapper from './MapWrapper';
 
-export const CreateEvent: FC = () => {
-	const { user } = useUser();
-	console.log(user);
-	if (!user) {
-		return null;
-	}
+interface CreateEventProps {
+	profileImageUrl: string;
+}
 
+export const CreateEvent: FC<CreateEventProps> = ({ profileImageUrl }) => {
 	const { mutate } = api.events.create.useMutation();
 
 	const handleFormSubmit = (data: EventFormData) => {
@@ -62,7 +60,7 @@ export const CreateEvent: FC = () => {
 			<VStack spacing={6} ref={vStackRef}>
 				<Flex justifyContent={'space-between'} alignItems='center' w='100%'>
 					<Image
-						src={user.profileImageUrl}
+						src={profileImageUrl}
 						alt={'Profile image'}
 						width={128}
 						height={128}

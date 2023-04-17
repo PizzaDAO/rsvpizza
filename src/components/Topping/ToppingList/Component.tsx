@@ -1,4 +1,5 @@
-import { Spinner, List, ListItem, Text } from '@chakra-ui/react';
+import { PlusSquareIcon } from '@chakra-ui/icons';
+import { Spinner, List, ListItem, Text, ListIcon } from '@chakra-ui/react';
 import { FC } from 'react';
 import { Topping } from '~/schemas';
 
@@ -22,10 +23,15 @@ export const ToppingList: FC<ToppingListProps> = ({
 		<>
 			{toppings && (
 				<>
-					<Text>Toppings</Text>
+					<Text fontSize='3xl' as='u'>
+						Toppings
+					</Text>
 					<List spacing={3}>
 						{toppings.map((topping) => (
-							<ListItem key={topping.id}>{topping.name}</ListItem>
+							<ListItem key={topping.id}>
+								<ListIcon as={PlusSquareIcon} color='green.500' />
+								{topping.name}
+							</ListItem>
 						))}
 					</List>
 				</>

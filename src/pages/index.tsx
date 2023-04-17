@@ -32,7 +32,7 @@ const Home: NextPage = () => {
 				{user.isSignedIn ? (
 					<>
 						<Box alignSelf={'center'}>
-							<CreateEvent />
+							<CreateEvent profileImageUrl={user.user.profileImageUrl} />
 							<SignOutButton />
 						</Box>
 						<Spacer mb={8} />
