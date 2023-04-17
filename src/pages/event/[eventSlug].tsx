@@ -1,8 +1,8 @@
 import { Flex, VStack } from '@chakra-ui/react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { EventList } from '~/components';
-import { api } from '~/utils/api';
+import { CreateOrder, EventList, OrderList } from '~/components';
+import { api, transformOrdersData } from '~/utils/api';
 
 // Your other imports
 
@@ -10,17 +10,32 @@ const EventPage: React.FC = () => {
 	const router = useRouter();
 	const { eventSlug } = router.query;
 
-	const { data, isLoading, isError, error } = api.events.getBySlug.useQuery(
-		eventSlug as string
-	);
+	const {
+		data: eventData,
+		isLoading: eventIsLoading,
+		isError: eventIsError,
+		error: eventError,
+	} = api.events.getBySlug.useQuery(eventSlug as string, {
+		enabled: !!eventSlug,
+	});
+
+	const {
+		data: ordersData,
+		isLoading: ordersIsLoading,
+		isError: ordersIsError,
+		error: ordersError,
+	} = api.orders.getAllByEvent.useQuery(eventData?.id as string, {
+		enabled: !!eventData,
+		select: (orders) => transformOrdersData(orders),
+	});
 
 	// Handle loading and error states
-	if (isLoading) {
+	if (eventIsLoading) {
 		return <div>Loading...</div>;
 	}
 
-	if (isError) {
-		return <div>Error: {error.message}</div>;
+	if (eventIsError) {
+		return <div>Error: {eventError.message}</div>;
 	}
 
 	return (
@@ -29,7 +44,7 @@ const EventPage: React.FC = () => {
 				<title>Event - rsv your P</title>
 				<meta
 					name='description'
-					content={`Make your pizza order for the ${data.name} event!}`}
+					content={`Make your pizza order for the ${eventData.name} event!}`}
 				/>
 			</Head>
 			<Flex
@@ -39,7 +54,17 @@ const EventPage: React.FC = () => {
 				paddingBottom={6}
 			>
 				<VStack spacing={6} alignItems='center' flexGrow={1}>
-					<EventList events={[data]} isLoading={isLoading} isError={isError} />
+					<EventList
+						events={[eventData]}
+						isLoading={eventIsLoading}
+						isError={eventIsError}
+					/>
+					<CreateOrder eventId={eventData.id} />
+					<OrderList
+						orders={ordersData}
+						isLoading={ordersIsLoading}
+						isError={ordersIsError}
+					/>
 				</VStack>
 			</Flex>
 		</>

@@ -14,8 +14,8 @@ import {
 	Td,
 } from '@chakra-ui/react';
 import { FC } from 'react';
-import { Order } from '~/schemas';
 import NextLink from 'next/link';
+import { DietaryRestriction, Order, Topping } from '@prisma/client';
 
 interface OrderListProps {
 	orders: Order[] | null | undefined;
@@ -37,7 +37,7 @@ export const OrderList: FC<OrderListProps> = ({
 		<>
 			{orders && (
 				<TableContainer>
-					<Table variant='striped' colorScheme='teal'>
+					<Table variant='striped' colorScheme='slate'>
 						<TableCaption>Events Pizza Orders</TableCaption>
 						<Thead>
 							<Tr>
@@ -49,8 +49,20 @@ export const OrderList: FC<OrderListProps> = ({
 						<Tbody>
 							{orders.map((order) => (
 								<Tr key={order.id}>
-									<Td>order.dietaryRestrictions</Td>
-									<Td>order.toppings</Td>
+									<Td>
+										{(order.dietaryRestrictions as DietaryRestriction[]).reduce(
+											(acc, curr, index) =>
+												index === 0 ? curr.name : acc + ' + ' + curr.name,
+											''
+										)}
+									</Td>
+									<Td>
+										{(order.toppings as Topping[]).reduce(
+											(acc, curr, index) =>
+												index === 0 ? curr.name : acc + ' + ' + curr.name,
+											''
+										)}
+									</Td>
 									<Td>{order.sliceQuantity}</Td>
 								</Tr>
 							))}
