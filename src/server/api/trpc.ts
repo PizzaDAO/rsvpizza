@@ -17,6 +17,7 @@
 import { type CreateNextContextOptions } from '@trpc/server/adapters/next';
 
 import { prisma } from '~/server/db';
+import { getAuth, clerkClient } from '@clerk/nextjs/server';
 
 /**
  * This is the actual context you will use in your router. It will be used to process every request
@@ -24,15 +25,21 @@ import { prisma } from '~/server/db';
  *
  * @see https://trpc.io/docs/context
  */
-export const createTRPCContext = (opts: CreateNextContextOptions) => {
+export const createTRPCContext = async (opts: CreateNextContextOptions) => {
 	const { req } = opts;
-	const sesh = getAuth(req);
+	const session = getAuth(req);
 
-	const userId = sesh.userId;
+	const userId = session.userId;
+
+	// Get the user's email addresses from Clerk if they are logged in
+	// This is used to determine if they are an admin or not
+	const userData = userId ? await clerkClient.users.getUser(userId) : null;
+	const emailAddresses = userData ? userData.emailAddresses : [];
 
 	return {
 		prisma,
 		userId,
+		emailAddresses,
 	};
 };
 
@@ -43,7 +50,6 @@ export const createTRPCContext = (opts: CreateNextContextOptions) => {
  */
 import { initTRPC, TRPCError } from '@trpc/server';
 import superjson from 'superjson';
-import { getAuth } from '@clerk/nextjs/server';
 import { ZodError } from 'zod';
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
@@ -98,3 +104,30 @@ const enforceUserIsAuthed = t.middleware(async ({ ctx, next }) => {
 });
 
 export const privateProcedure = t.procedure.use(enforceUserIsAuthed);
+
+const enforceUserIsAdmin = t.middleware(async ({ ctx, next }) => {
+	const usersWithAdmin = await prisma.user.findMany({
+		where: {
+			email: {
+				in: ctx.emailAddresses.map((email) => email.emailAddress),
+			},
+			role: 'ADMIN',
+		},
+	});
+
+	if (!usersWithAdmin.length) {
+		throw new TRPCError({
+			code: 'FORBIDDEN',
+		});
+	}
+
+	return next({
+		ctx: {
+			userId: ctx.userId,
+		},
+	});
+});
+
+export const adminProcedure = t.procedure
+	.use(enforceUserIsAuthed)
+	.use(enforceUserIsAdmin);

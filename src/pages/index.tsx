@@ -10,9 +10,9 @@ import { CreateEvent, EventList } from '~/components';
 const Home: NextPage = () => {
 	const user = useUser();
 
-	const { data, isLoading, isError } = user.isSignedIn
-		? api.events.getAll.useQuery()
-		: { data: null, isLoading: false, isError: false };
+	const { data, isLoading, isError } = api.events.getAll.useQuery(undefined, {
+		enabled: user.isSignedIn,
+	});
 
 	return (
 		<>

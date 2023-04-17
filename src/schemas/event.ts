@@ -1,9 +1,8 @@
 import { z } from 'zod';
-import { datetimeSchema } from './utils';
 
 export const EventSchema = z.object({
 	id: z.string(),
-	creatorId: z.string(),
+	userId: z.string(),
 	createdAt: z.date(),
 	updatedAt: z.date(),
 	name: z.string(),
@@ -18,24 +17,9 @@ export type Event = z.infer<typeof EventSchema>;
 
 export const EventFormSchema = z.object({
 	name: z.string().nonempty({ message: 'Please enter an event name.' }),
-	datetime: datetimeSchema,
+	datetime: z.date(),
 	location: z.string().nonempty({ message: 'Please enter a location.' }),
-	attendees: z
-		.string()
-		.refine(
-			(value) => {
-				try {
-					const num = Number(value);
-					return !isNaN(num) && num > 0;
-				} catch {
-					return false;
-				}
-			},
-			{
-				message: 'Attendees must be a number greater than zero.',
-			}
-		)
-		.transform((value) => Number(value)),
+	attendees: z.number().min(1, 'Please enter a number greater than 0.'),
 	description: z
 		.string()
 		.nonempty({ message: 'Please enter a description.' })

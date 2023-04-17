@@ -1,8 +1,6 @@
-import type { User } from '@clerk/nextjs/dist/api';
-import { clerkClient } from '@clerk/nextjs/server';
+import { nanoid } from 'nanoid';
 import { z } from 'zod';
-import { EventSchema } from '~/schemas/event';
-
+import { EventFormSchema, EventSchema } from '~/schemas/event';
 import {
 	createTRPCRouter,
 	privateProcedure,
@@ -14,7 +12,7 @@ export const eventsRouter = createTRPCRouter({
 		const events = await ctx.prisma.event.findMany({
 			take: 100,
 			where: {
-				creatorId: {
+				userId: {
 					equals: ctx.userId!,
 				},
 			},
@@ -25,31 +23,46 @@ export const eventsRouter = createTRPCRouter({
 		return validatedEvents;
 	}),
 
+	getBySlug: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
+		const event = await ctx.prisma.event.findUnique({
+			where: {
+				slug: input,
+			},
+		});
+
+		if (!event) {
+			// TODO: Should this be a 404? Or is there a better error I can throw?
+			throw new Error(`Event with slug '${input}' not found`);
+		}
+
+		const validatedEvent = EventSchema.parse(event);
+		return validatedEvent;
+	}),
+
 	create: privateProcedure
-		.input(
-			z.object({
-				name: z.string().min(1, 'Event name is required'),
-				datetime: z.date(),
-				location: z.string().min(1, 'Location is required'),
-				attendees: z.number().min(1, 'Number of attendees must be at least 1'),
-				slug: z.string().max(200, 'Slug must be a maximum of 255 characters'),
-				description: z
-					.string()
-					.max(255, 'Description must be a maximum of 255 characters'),
-			})
-		)
+		.input(EventFormSchema)
 		.mutation(async ({ ctx, input }) => {
-			const creatorId = ctx.userId;
+			let slug: string;
+			let isUnique = false;
+
+			// ensure slug is unique before creating event
+			while (!isUnique) {
+				slug = nanoid();
+				const existingEvent = await ctx.prisma.event.findUnique({
+					where: { slug },
+				});
+				isUnique = existingEvent === null;
+			}
 
 			const event = await ctx.prisma.event.create({
 				data: {
-					creatorId,
+					userId: ctx.userId,
 					name: input.name,
 					description: input.description,
 					datetime: input.datetime,
 					location: input.location,
 					attendees: input.attendees,
-					slug: input.slug,
+					slug: slug!,
 				},
 			});
 

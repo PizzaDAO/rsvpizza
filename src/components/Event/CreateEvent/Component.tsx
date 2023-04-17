@@ -1,13 +1,21 @@
-import { Box, Flex, Heading, VStack } from '@chakra-ui/react';
-import { NextPage } from 'next';
+/* eslint-disable react-hooks/rules-of-hooks */
+import {
+	Box,
+	Flex,
+	Heading,
+	VStack,
+	AspectRatio,
+	useBreakpointValue,
+} from '@chakra-ui/react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { EventForm } from './EventForm';
 import { EventFormData } from '~/schemas';
 import { useUser } from '@clerk/nextjs';
 import Image from 'next/image';
 import { api } from '~/utils/api';
-import generateUniqueSlug from '~/utils/generateUniqueSlug';
+import MapWrapper from './MapWrapper';
 
-export const CreateEvent: NextPage = () => {
+export const CreateEvent: FC = () => {
 	const { user } = useUser();
 	console.log(user);
 	if (!user) {
@@ -19,32 +27,55 @@ export const CreateEvent: NextPage = () => {
 	const handleFormSubmit = (data: EventFormData) => {
 		// Handle form submission here, such as calling an API or updating state
 		console.log('Form submitted with data:', data);
-		const newData = { ...data, slug: generateUniqueSlug() };
-		mutate(newData);
+		// HACK: add slug to data so it can pass validation. This is a hacky way to do it
+		// but it works for now. The events router replaces the slug with the generated
+		// slug.
+		const newData = { ...data, slug: '' };
+		mutate(data);
 	};
+
+	const formWidth = useBreakpointValue({
+		base: '100%',
+		sm: '28em',
+		md: '30em',
+	});
+	const mapWidth = useBreakpointValue({ base: '100%', sm: '28em', md: '30em' });
+
+	const vStackRef = useRef<HTMLDivElement>(null);
+	const [vStackHeight, setVStackHeight] = useState(0);
+
+	useEffect(() => {
+		if (vStackRef.current) {
+			setVStackHeight(vStackRef.current.getBoundingClientRect().height);
+		}
+	}, [vStackRef]);
 
 	return (
 		<Flex
 			position={'relative'}
-			flexDirection={'row'}
+			flexDirection={['column', 'column', 'row']}
 			justifyContent={'flex-start'}
 			bgColor={'blue.500'}
-			w={'500px'}
+			w={['100%', '100%', '65em']}
+			mx='auto'
 		>
-			<Flex position={'absolute'} top={'0'} left={'0'}>
-				<Image
-					src={user.profileImageUrl}
-					alt={'Profile image'}
-					width={128}
-					height={128}
-				/>
-			</Flex>
-			<VStack spacing={6}>
-				<Heading>Create Event</Heading>
-				<Box width='100%' maxWidth='600px'>
+			<VStack spacing={6} ref={vStackRef}>
+				<Flex justifyContent={'space-between'} alignItems='center' w='100%'>
+					<Image
+						src={user.profileImageUrl}
+						alt={'Profile image'}
+						width={128}
+						height={128}
+					/>
+					<Heading>Create Event</Heading>
+				</Flex>
+				<Box width='100%'>
 					<EventForm onSubmit={handleFormSubmit} />
 				</Box>
 			</VStack>
+			<Box height={vStackHeight > 0 ? `${vStackHeight}px` : 'auto'}>
+				<MapWrapper lat={51.505} lng={-0.09} />
+			</Box>
 		</Flex>
 	);
 };
