@@ -1,10 +1,9 @@
 import React from 'react';
 import { type NextPage } from 'next';
 import Head from 'next/head';
-
 import { api } from '~/utils/api';
-import { SignInButton, SignOutButton, useUser } from '@clerk/nextjs';
-import { Box, Text, VStack, Spacer, Flex, Spinner } from '@chakra-ui/react';
+import { useUser } from '@clerk/nextjs';
+import { Box, VStack, Spacer, Flex } from '@chakra-ui/react';
 import { CreateEvent, EventList } from '~/components';
 
 const Home: NextPage = () => {
@@ -33,7 +32,6 @@ const Home: NextPage = () => {
 					<>
 						<Box alignSelf={'center'}>
 							<CreateEvent profileImageUrl={user.user.profileImageUrl} />
-							<SignOutButton />
 						</Box>
 						<Spacer mb={8} />
 						<VStack spacing={6} alignItems='center' flexGrow={1}>
@@ -45,7 +43,7 @@ const Home: NextPage = () => {
 						</VStack>
 					</>
 				) : (
-					<SignInButton />
+					<>Please sign in to create an event</>
 				)}
 			</Flex>
 		</>

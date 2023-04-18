@@ -1,5 +1,5 @@
 import { Box, Flex, Spacer, Text, VStack } from '@chakra-ui/react';
-import { SignInButton, SignOutButton, useUser } from '@clerk/nextjs';
+import { useUser } from '@clerk/nextjs';
 import { NextPage } from 'next';
 import Head from 'next/head';
 import { CreateDietaryRestriction, DietaryRestrictionList } from '~/components';
@@ -30,29 +30,21 @@ export const DietaryRestrictions: NextPage = () => {
 				paddingBottom={6}
 			>
 				{user.isSignedIn && isAdmin ? (
-					<>
-						<Box alignSelf={'center'}>
-							<CreateDietaryRestriction />
-							<SignOutButton />
-						</Box>
-					</>
+					<Box alignSelf={'center'}>
+						<CreateDietaryRestriction />
+					</Box>
 				) : !user.isSignedIn ? (
-					<>
-						<Text>
-							You must be signed in and a system admin to add new dietary
-							restriction types. If you should be a system admin, contact the
-							pizza mafia to be added
-						</Text>
-						<SignInButton />
-					</>
+					<Text>
+						{`You must be signed in and a system admin to add new dietary
+						restriction types. If you're supposed to be an admin, contact
+						PizzaDAO and the pizza mafia to be added`}
+					</Text>
 				) : (
-					<>
-						<Text>
-							You must be a system admin to add new dietary restriction types.
-							If you should be, contact the pizza mafia to be added
-						</Text>
-						<SignOutButton />
-					</>
+					<Text>
+						{`You must be a system admin to add new dietary restriction types. If
+						you're supposed to be an admin, contact PizzaDAO and the pizza mafia
+						to be added`}
+					</Text>
 				)}
 				<Spacer mb={8} />
 				<VStack spacing={6} alignItems='center' flexGrow={1}>

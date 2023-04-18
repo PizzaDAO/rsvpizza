@@ -1,5 +1,5 @@
 import { Box, Flex, Spacer, Text, VStack } from '@chakra-ui/react';
-import { SignInButton, SignOutButton, useUser } from '@clerk/nextjs';
+import { useUser } from '@clerk/nextjs';
 import { NextPage } from 'next';
 import Head from 'next/head';
 import { CreateUser, UserList } from '~/components';
@@ -34,7 +34,6 @@ export const Users: NextPage = () => {
 					<>
 						<Box alignSelf={'center'}>
 							<CreateUser />
-							<SignOutButton />
 						</Box>
 						<Spacer mb={8} />
 						<VStack spacing={6} alignItems='center' flexGrow={1}>
@@ -42,15 +41,17 @@ export const Users: NextPage = () => {
 						</VStack>
 					</>
 				) : !user.isSignedIn ? (
-					<SignInButton />
+					<Text>
+						{`You must be signed in and a system admin to add new system admins or
+						see existing admin users' details. If you're supposed to be an
+						admin, contact PizzaDAO and the pizza mafia to be added`}
+					</Text>
 				) : (
-					<>
-						<Text>
-							You are not an system admin. If you should be, contact the pizza
-							mafia to be added
-						</Text>
-						<SignOutButton />
-					</>
+					<Text>
+						{`You must be a system admin to add new system admins or see existing
+						admin users' details. If you're supposed to be an admin, contact
+						PizzaDAO and the pizza mafia to be added`}
+					</Text>
 				)}
 			</Flex>
 		</>
