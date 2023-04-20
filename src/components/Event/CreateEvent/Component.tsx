@@ -9,7 +9,6 @@ import {
 import { FC, useEffect, useRef, useState } from 'react';
 import { EventForm } from './EventForm';
 import { EventFormData } from '~/schemas';
-import { User } from '@clerk/clerk-sdk-node';
 import Image from 'next/image';
 import { api } from '~/utils/api';
 import MapWrapper from './MapWrapper';
@@ -19,7 +18,17 @@ interface CreateEventProps {
 }
 
 export const CreateEvent: FC<CreateEventProps> = ({ profileImageUrl }) => {
-	const { mutate } = api.events.create.useMutation();
+	const ctx = api.useContext();
+
+	const { mutate } = api.events.create.useMutation({
+		onSuccess: () => {
+			// TODO: check wether this will invalidate the events for all users
+			// instead of just the current user (as desired) as the user is determined
+			// in the api call by the clerk user id in the context, and not given as a
+			// parameter to the events.getAll function.
+			ctx.events.getAll.invalidate();
+		},
+	});
 
 	const handleFormSubmit = (data: EventFormData) => {
 		// Handle form submission here, such as calling an API or updating state

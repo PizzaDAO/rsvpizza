@@ -18,7 +18,13 @@ import {
 import { api } from '~/utils/api';
 
 export const CreateDietaryRestriction: FC = () => {
-	const { mutate } = api.dietaryRestrictions.create.useMutation();
+	const ctx = api.useContext();
+
+	const { mutate } = api.dietaryRestrictions.create.useMutation({
+		onSuccess: () => {
+			ctx.dietaryRestrictions.getAll.invalidate();
+		},
+	});
 
 	const handleFormSubmit = (data: DietaryRestrictionFormData) => {
 		mutate(data);

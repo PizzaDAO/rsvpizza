@@ -9,6 +9,7 @@
 		"hookform",
 		"nextjs",
 		"superjson",
+		"tanstack",
 		"TRPC"
 	]
 }

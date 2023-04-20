@@ -14,8 +14,6 @@ import {
 } from '@chakra-ui/react';
 import { OrderFormData } from '~/schemas/order';
 import { api } from '~/utils/api';
-import { Topping } from '~/schemas/topping';
-import { DietaryRestriction } from '~/schemas/dietaryRestriction';
 
 const initialFormValues: OrderFormData = {
 	eventId: '',
@@ -28,15 +26,9 @@ const initialFormValues: OrderFormData = {
 
 interface CreateOrderProps {
 	eventId: string;
-	//toppings: Topping[];
-	//dietaryRestrictions: DietaryRestriction[];
 }
 
-export const CreateOrder: React.FC<CreateOrderProps> = ({
-	eventId,
-	//toppings,
-	//dietaryRestrictions,
-}) => {
+export const CreateOrder: React.FC<CreateOrderProps> = ({ eventId }) => {
 	const { data: toppings, isLoading: toppingsIsLoading } =
 		api.toppings.getAll.useQuery();
 
@@ -48,7 +40,13 @@ export const CreateOrder: React.FC<CreateOrderProps> = ({
 		eventId,
 	});
 
-	const { mutate } = api.orders.create.useMutation();
+	const ctx = api.useContext();
+
+	const { mutate } = api.orders.create.useMutation({
+		onSuccess: () => {
+			ctx.orders.getAllByEvent.invalidate(eventId);
+		},
+	});
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setFormValues({ ...formValues, [e.target.name]: e.target.value });

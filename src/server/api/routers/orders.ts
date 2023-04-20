@@ -12,6 +12,9 @@ export const ordersRouter = createTRPCRouter({
 						equals: input,
 					},
 				},
+				orderBy: {
+					createdAt: 'desc',
+				},
 			});
 
 			return orders;

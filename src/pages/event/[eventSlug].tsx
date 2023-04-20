@@ -1,4 +1,5 @@
 import { Flex, VStack } from '@chakra-ui/react';
+import { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { CreateOrder, EventList, OrderList } from '~/components';
@@ -6,7 +7,7 @@ import { api, transformOrdersData } from '~/utils/api';
 
 // Your other imports
 
-const EventPage: React.FC = () => {
+const EventPage: NextPage = () => {
 	const router = useRouter();
 	const { eventSlug } = router.query;
 

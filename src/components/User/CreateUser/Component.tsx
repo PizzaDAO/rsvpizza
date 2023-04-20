@@ -16,7 +16,13 @@ import { UserFormData, UserFormSchema } from '~/schemas';
 import { api } from '~/utils/api';
 
 export const CreateUser: FC = () => {
-	const { mutate } = api.users.create.useMutation();
+	const ctx = api.useContext();
+
+	const { mutate } = api.users.create.useMutation({
+		onSuccess: () => {
+			ctx.users.getAll.invalidate();
+		},
+	});
 
 	const handleFormSubmit = (data: UserFormData) => {
 		mutate(data);

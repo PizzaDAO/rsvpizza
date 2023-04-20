@@ -15,7 +15,13 @@ import { ToppingFormData, ToppingFormSchema } from '~/schemas';
 import { api } from '~/utils/api';
 
 export const CreateTopping: FC = () => {
-	const { mutate } = api.toppings.create.useMutation();
+	const ctx = api.useContext();
+
+	const { mutate } = api.toppings.create.useMutation({
+		onSuccess: () => {
+			ctx.toppings.getAll.invalidate();
+		},
+	});
 
 	const handleFormSubmit = (data: ToppingFormData) => {
 		mutate(data);
