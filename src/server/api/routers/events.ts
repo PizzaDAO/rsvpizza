@@ -16,6 +16,9 @@ export const eventsRouter = createTRPCRouter({
 					equals: ctx.userId!,
 				},
 			},
+			orderBy: {
+				datetime: 'asc',
+			},
 		});
 
 		const validatedEvents = events.map((event) => EventSchema.parse(event));

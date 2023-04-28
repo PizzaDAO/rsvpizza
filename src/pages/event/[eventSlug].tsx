@@ -1,4 +1,4 @@
-import { Flex, VStack } from '@chakra-ui/react';
+import { Flex, Spinner, VStack } from '@chakra-ui/react';
 import { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -12,7 +12,7 @@ const EventPage: NextPage = () => {
 	const { eventSlug } = router.query;
 
 	const {
-		data: eventData,
+		data: event,
 		isLoading: eventIsLoading,
 		isError: eventIsError,
 		error: eventError,
@@ -21,18 +21,35 @@ const EventPage: NextPage = () => {
 	});
 
 	const {
-		data: ordersData,
+		data: orders,
 		isLoading: ordersIsLoading,
 		isError: ordersIsError,
+		isSuccess: ordersIsSuccess,
 		error: ordersError,
-	} = api.orders.getAllByEvent.useQuery(eventData?.id as string, {
-		enabled: !!eventData,
+	} = api.orders.getAllByEvent.useQuery(event?.id as string, {
+		enabled: !!event,
 		select: (orders) => transformOrdersData(orders),
 	});
 
+	const {
+		data: toppings,
+		isLoading: toppingsIsLoading,
+		isSuccess: toppingsIsSuccess,
+		isError: toppingsIsError,
+		error: toppingsError,
+	} = api.toppings.getAll.useQuery();
+
+	const {
+		data: dietaryRestrictions,
+		isLoading: dietaryRestrictionsIsLoading,
+		isSuccess: dietaryRestrictionsIsSuccess,
+		isError: dietaryRestrictionsIsError,
+		error: dietaryRestrictionsError,
+	} = api.dietaryRestrictions.getAll.useQuery();
+
 	// Handle loading and error states
 	if (eventIsLoading) {
-		return <div>Loading...</div>;
+		return <Spinner />;
 	}
 
 	if (eventIsError) {
@@ -45,7 +62,7 @@ const EventPage: NextPage = () => {
 				<title>Event - rsv your P</title>
 				<meta
 					name='description'
-					content={`Make your pizza order for the ${eventData.name} event!}`}
+					content={`Make your pizza order for the ${event.name} event!}`}
 				/>
 			</Head>
 			<Flex
@@ -56,16 +73,44 @@ const EventPage: NextPage = () => {
 			>
 				<VStack spacing={6} alignItems='center' flexGrow={1}>
 					<EventList
-						events={[eventData]}
+						events={[event]}
 						isLoading={eventIsLoading}
 						isError={eventIsError}
 					/>
-					<CreateOrder eventId={eventData.id} />
-					<OrderList
-						orders={ordersData}
-						isLoading={ordersIsLoading}
-						isError={ordersIsError}
+					<CreateOrder
+						eventId={event.id}
+						toppings={toppings}
+						dietaryRestrictions={dietaryRestrictions}
 					/>
+					{(ordersIsLoading ||
+						toppingsIsLoading ||
+						dietaryRestrictionsIsLoading) && <Spinner />}
+
+					{ordersIsSuccess &&
+						toppingsIsSuccess &&
+						dietaryRestrictionsIsSuccess && (
+							<OrderList
+								orders={orders}
+								toppings={toppings}
+								dietaryRestrictions={dietaryRestrictions}
+								isLoading={
+									ordersIsLoading ||
+									toppingsIsLoading ||
+									dietaryRestrictionsIsLoading
+								}
+								isSuccess={
+									ordersIsSuccess &&
+									toppingsIsSuccess &&
+									dietaryRestrictionsIsSuccess
+								}
+								isError={
+									ordersIsError || toppingsIsError || dietaryRestrictionsIsError
+								}
+								/* error={`orders error: ${ordersError?.message}
+								 | toppings error: ${toppingsError?.message} 
+								 | dietary restrictions error:  ${dietaryRestrictionsError?.message}`} */
+							/>
+						)}
 				</VStack>
 			</Flex>
 		</>

@@ -16,6 +16,11 @@ enum ROLE {
   USER
 }
 
+enum TOPPING_CATEGORY {
+  MEAT
+  NON_MEAT
+}
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
@@ -40,23 +45,24 @@ model Event {
 }
 
 model Order {
-  id                  String   @id @default(cuid())
-  eventId             String
-  userId              String?
-  name                String?
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-  dietaryRestrictions Json
-  toppings            Json
-  sliceQuantity       Int
+  id                    String   @id @default(cuid())
+  eventId               String
+  userId                String?
+  name                  String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  dietaryRestrictionIds Json
+  toppingIds            Json
+  sliceQuantity         Int
 
   @@index([eventId])
   @@index([userId])
 }
 
 model Topping {
-  id   Int    @id @default(autoincrement())
-  name String
+  id       Int              @id @default(autoincrement())
+  name     String
+  category TOPPING_CATEGORY @default(NON_MEAT)
 }
 
 model DietaryRestriction {

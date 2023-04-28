@@ -1,45 +1,43 @@
-import React, { useState } from 'react';
+import { FC } from 'react';
 import {
 	Box,
 	Button,
 	Checkbox,
 	CheckboxGroup,
+	Flex,
 	FormControl,
+	FormErrorMessage,
 	FormLabel,
-	HStack,
 	Input,
+	NumberDecrementStepper,
+	NumberIncrementStepper,
 	NumberInput,
 	NumberInputField,
+	NumberInputStepper,
 	VStack,
+	useToast,
 } from '@chakra-ui/react';
-import { OrderFormData } from '~/schemas/order';
+import { OrderFormData, OrderFormSchema } from '~/schemas/order';
 import { api } from '~/utils/api';
-
-const initialFormValues: OrderFormData = {
-	eventId: '',
-	name: '',
-	userId: '',
-	dietaryRestrictions: [],
-	toppings: [],
-	sliceQuantity: 1,
-};
+import { DietaryRestriction, Topping } from '@prisma/client';
+import { Controller, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useAuth } from '@clerk/nextjs';
 
 interface CreateOrderProps {
 	eventId: string;
+	toppings: Topping[] | undefined;
+	dietaryRestrictions: DietaryRestriction[] | undefined;
 }
 
-export const CreateOrder: React.FC<CreateOrderProps> = ({ eventId }) => {
-	const { data: toppings, isLoading: toppingsIsLoading } =
-		api.toppings.getAll.useQuery();
-
-	const { data: dietaryRestrictions, isLoading: dietaryRestrictionsIsLoading } =
-		api.dietaryRestrictions.getAll.useQuery();
-
-	const [formValues, setFormValues] = useState<OrderFormData>({
-		...initialFormValues,
-		eventId,
-	});
-
+export const CreateOrder: FC<CreateOrderProps> = ({
+	eventId,
+	toppings,
+	dietaryRestrictions,
+}) => {
+	// stuff related to the api
+	const { userId } = useAuth();
+	const toast = useToast();
 	const ctx = api.useContext();
 
 	const { mutate } = api.orders.create.useMutation({
@@ -48,114 +46,151 @@ export const CreateOrder: React.FC<CreateOrderProps> = ({ eventId }) => {
 		},
 	});
 
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setFormValues({ ...formValues, [e.target.name]: e.target.value });
-	};
+	// stuff related to the form
+	const {
+		register,
+		handleSubmit,
+		control,
+		getValues,
+		setValue,
+		formState: { errors, isSubmitting },
+		reset,
+	} = useForm<OrderFormData>({
+		defaultValues: {
+			eventId: '',
+			name: '',
+			userId: '',
+			dietaryRestrictionIds: [],
+			toppingIds: [],
+			sliceQuantity: 1,
+		},
+		resolver: zodResolver(OrderFormSchema),
+	});
 
-	const handleToppingsChange = (values: string[]) => {
-		setFormValues({
-			...formValues,
-			toppings: values
-				.filter((value) => value)
-				.map((value) => JSON.parse(value)),
+	const onSubmit = (data: OrderFormData) => {
+		const { name, toppingIds, dietaryRestrictionIds, sliceQuantity } = data;
+		mutate({
+			eventId,
+			name,
+			toppingIds: toppingIds.map(Number),
+			dietaryRestrictionIds: dietaryRestrictionIds.map(Number),
+			sliceQuantity,
+			userId: userId ?? undefined,
 		});
-	};
 
-	const handleDietaryRestrictionsChange = (values: string[]) => {
-		setFormValues({
-			...formValues,
-			dietaryRestrictions: values
-				.filter((value) => value)
-				.map((value) => JSON.parse(value)),
+		toast({
+			title: 'Order created',
+			description: 'Your order has been created.',
+			status: 'success',
+			duration: 5000,
+			isClosable: true,
 		});
+
+		reset();
 	};
 
-	const handleSliceQuantityChange = (
-		valueAsString: string,
-		valueAsNumber: number
-	) => {
-		setFormValues({ ...formValues, sliceQuantity: valueAsNumber });
-	};
-
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		mutate(formValues);
-	};
-
+	console.log('errors', errors);
 	return (
-		<Box as='form' onSubmit={handleSubmit}>
+		<Box as='form' onSubmit={handleSubmit(onSubmit)}>
 			<VStack spacing={4} alignItems='stretch'>
-				<FormControl>
+				<FormControl id='name' isInvalid={!!errors.name}>
 					<FormLabel>Name (optional)</FormLabel>
-					<Input name='name' value={formValues.name} onChange={handleChange} />
+					<Input
+						{...register('name', {
+							required: { value: false, message: 'something something' },
+						})}
+						placeholder='Name'
+						variant='filled'
+					/>
+					<FormErrorMessage>{errors.name?.message}</FormErrorMessage>
 				</FormControl>
 				<FormControl>
 					<FormLabel>Toppings</FormLabel>
-					<CheckboxGroup
-						defaultValue={
-							formValues.toppings.length > 0
-								? formValues.toppings.map(
-										(topping) => topping?.id?.toString() || ''
-								  )
-								: []
-						}
-						onChange={handleToppingsChange}
-					>
-						<HStack>
-							{toppings &&
-								toppings.map((topping) => (
-									<Checkbox
-										key={topping.id}
-										value={JSON.stringify({
-											id: topping.id,
-											name: topping.name,
-										})}
-									>
-										{topping.name}
-									</Checkbox>
-								))}
-						</HStack>
-					</CheckboxGroup>
+					<Controller
+						name={'toppingIds'}
+						control={control}
+						render={({ field: { onChange, ...rest } }) => (
+							<CheckboxGroup
+								defaultValue={[]}
+								onChange={(val) => {
+									onChange(val.map((v) => Number(v)));
+								}}
+								{...rest}
+							>
+								<Flex flexWrap='wrap'>
+									{toppings &&
+										toppings.map((topping) => (
+											<Checkbox
+												value={topping.id}
+												key={topping.id}
+												isChecked={getValues().toppingIds.includes(topping.id)}
+											>
+												{topping.name}
+											</Checkbox>
+										))}
+								</Flex>
+							</CheckboxGroup>
+						)}
+					/>
+					<FormErrorMessage>{errors.toppingIds?.message}</FormErrorMessage>
 				</FormControl>
 				<FormControl>
-					<FormLabel>Dietary Restrictions</FormLabel>
-					<CheckboxGroup
-						defaultValue={
-							formValues.dietaryRestrictions.length > 0
-								? formValues.dietaryRestrictions.map(
-										(restriction) => restriction?.id?.toString() || ''
-								  )
-								: []
-						}
-						onChange={handleDietaryRestrictionsChange}
-					>
-						<HStack>
-							{dietaryRestrictions &&
-								dietaryRestrictions.map((restriction) => (
-									<Checkbox
-										key={restriction.id}
-										value={JSON.stringify({
-											id: restriction.id,
-											name: restriction.name,
-										})}
-									>
-										{restriction.name}
-									</Checkbox>
-								))}
-						</HStack>
-					</CheckboxGroup>
+					<FormLabel>Toppings</FormLabel>
+					<Controller
+						name={'dietaryRestrictionIds'}
+						control={control}
+						render={({ field: { onChange, ...rest } }) => (
+							<CheckboxGroup
+								defaultValue={[]}
+								onChange={(val) => {
+									onChange(val.map((v) => Number(v)));
+								}}
+								{...rest}
+							>
+								<Flex flexWrap='wrap'>
+									{dietaryRestrictions &&
+										dietaryRestrictions.map((dietaryRestriction) => (
+											<Checkbox
+												value={dietaryRestriction.id}
+												key={dietaryRestriction.id}
+												isChecked={getValues().dietaryRestrictionIds.includes(
+													dietaryRestriction.id
+												)}
+											>
+												{dietaryRestriction.name}
+											</Checkbox>
+										))}
+								</Flex>
+							</CheckboxGroup>
+						)}
+					/>
+					<FormErrorMessage>
+						{errors.dietaryRestrictionIds?.message}
+					</FormErrorMessage>
 				</FormControl>
 				<FormControl>
-					<FormLabel>Slice Quantity</FormLabel>
-					<NumberInput
-						min={1}
-						value={formValues.sliceQuantity}
-						onChange={handleSliceQuantityChange}
-					>
-						<NumberInputField />
-					</NumberInput>
+					<FormLabel>Number of Slices</FormLabel>
+
+					<Controller
+						name='sliceQuantity'
+						control={control}
+						render={({ field: { onChange, ...rest } }) => (
+							<NumberInput
+								onChange={(_, n) => {
+									setValue('sliceQuantity', n);
+								}}
+								{...rest}
+							>
+								<NumberInputField />
+								<NumberInputStepper>
+									<NumberIncrementStepper />
+									<NumberDecrementStepper />
+								</NumberInputStepper>
+							</NumberInput>
+						)}
+					/>
 				</FormControl>
-				<Button type='submit' colorScheme='blue'>
+				<Button type='submit' colorScheme='blue' isDisabled={isSubmitting}>
 					Create Order
 				</Button>
 			</VStack>

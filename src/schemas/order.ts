@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { ToppingSchema } from './topping';
 import { DietaryRestrictionSchema } from './dietaryRestriction';
 
 export const OrderSchema = z.object({
@@ -9,8 +8,8 @@ export const OrderSchema = z.object({
 	name: z.string().optional(),
 	createdAt: z.date(),
 	updatedAt: z.date(),
-	dietaryRestrictions: z.array(DietaryRestrictionSchema),
-	toppings: z.array(ToppingSchema),
+	dietaryRestrictionIds: z.array(z.number()),
+	toppingIds: z.array(z.number()),
 	sliceQuantity: z.number(),
 });
 
@@ -20,8 +19,8 @@ export const OrderFormSchema = z.object({
 	eventId: z.string(),
 	name: z.string().optional(),
 	userId: z.string().optional(),
-	dietaryRestrictions: z.array(DietaryRestrictionSchema),
-	toppings: z.array(ToppingSchema),
+	dietaryRestrictionIds: z.array(z.number()),
+	toppingIds: z.array(z.number()),
 	sliceQuantity: z.number().min(1, { message: 'Please enter a quantity.' }),
 });
 

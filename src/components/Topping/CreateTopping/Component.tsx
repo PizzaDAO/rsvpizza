@@ -8,6 +8,7 @@ import {
 	FormErrorMessage,
 	VStack,
 	useToast,
+	Select,
 } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -58,6 +59,19 @@ export const CreateTopping: FC = () => {
 					<FormLabel htmlFor='name'>Topping Name</FormLabel>
 					<Input id='name' {...register('name')} />
 					<FormErrorMessage>{errors.name?.message}</FormErrorMessage>
+				</FormControl>
+				<FormControl isInvalid={!!errors.category}>
+					<FormLabel htmlFor='category'>Topping Category</FormLabel>
+					<Select
+						id='category'
+						{...register('category')}
+						bg={'white'}
+						color={'black'}
+					>
+						<option value='MEAT'>Meat</option>
+						<option value='NON_MEAT'>Non-Meat</option>
+					</Select>
+					<FormErrorMessage>{errors.category?.message}</FormErrorMessage>
 				</FormControl>
 				<Button
 					width='100%'

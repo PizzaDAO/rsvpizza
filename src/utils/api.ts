@@ -17,13 +17,13 @@ const getBaseUrl = () => {
 	return `http://localhost:${process.env.PORT ?? 3000}`; // dev SSR should use localhost
 };
 
-import { Order, DietaryRestriction, Topping } from '.prisma/client';
+import { Order, DietaryRestriction } from '.prisma/client';
 
 export const transformOrdersData = (orders: Order[]): Order[] => {
 	return orders.map((order) => ({
 		...order,
-		dietaryRestrictions: order.dietaryRestrictions as DietaryRestriction[],
-		toppings: order.toppings as Topping[],
+		dietaryRestrictionIds: order.dietaryRestrictionIds as DietaryRestriction[],
+		toppingIds: order.toppingIds as number[],
 	}));
 };
 
