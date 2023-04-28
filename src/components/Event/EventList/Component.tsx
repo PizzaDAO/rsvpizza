@@ -1,6 +1,7 @@
-import { Box, Text, VStack, Spinner } from '@chakra-ui/react';
+import { Box, Text, VStack, Spinner, Link } from '@chakra-ui/react';
 import { FC } from 'react';
 import { Event } from '~/schemas/event';
+import NextLink from 'next/link';
 
 interface EventListProps {
 	events: Event[] | null | undefined;
@@ -48,7 +49,12 @@ export const EventList: FC<EventListProps> = ({
 						</Text>
 						<Text mt={2}>{event.description}</Text>
 						<Text mt={2}>Location: {event.location}</Text>
-						<Text mt={2}>Reservation link: {event.slug}</Text>
+						<Text mt={2}>
+							Reservation link:{' '}
+							<Link as={NextLink} href={`/event/${event.slug}`}>
+								{event.slug}
+							</Link>
+						</Text>
 						<Text mt={2} fontWeight={'medium'}>
 							Attendees: {event.attendees}
 						</Text>

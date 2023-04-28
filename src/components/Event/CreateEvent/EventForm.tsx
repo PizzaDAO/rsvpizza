@@ -17,8 +17,14 @@ import {
 	Grid,
 	GridItem,
 } from '@chakra-ui/react';
-import PlacesAutocomplete from 'react-places-autocomplete';
-import { useForm } from 'react-hook-form';
+import ReactDatetime from 'react-datetime';
+import PlacesAutocomplete, {
+	geocodeByAddress,
+	getLatLng,
+} from 'react-places-autocomplete';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { EventFormSchema, EventFormData } from '~/schemas';
 import 'react-datetime/css/react-datetime.css';
@@ -39,6 +45,7 @@ export const EventForm: React.FC<EventFormProps> = ({ onSubmit }) => {
 		resolver: zodResolver(EventFormSchema),
 	});
 
+	const [startDate, setStartDate] = useState(new Date());
 	const [location, setLocation] = useState('');
 
 	useEffect(() => {
@@ -92,12 +99,23 @@ export const EventForm: React.FC<EventFormProps> = ({ onSubmit }) => {
 				<GridItem colSpan={{ base: 1, md: 2 }}>
 					<FormControl isInvalid={!!errors.datetime}>
 						<FormLabel htmlFor='datetime'>Date and Time</FormLabel>
-						<Input
-							type='datetime-local'
+						<DatePicker
 							id='datetime'
-							{...register('datetime')}
-							bg='gray.700'
-							color='white'
+							selected={startDate}
+							onChange={(date: Date) => {
+								setStartDate(date);
+								setValue('datetime', date);
+							}}
+							showTimeSelect
+							dateFormat='Pp'
+							customInput={
+								<Input
+									bg='gray.700'
+									color='white'
+									_hover={{ bg: 'gray.600' }}
+									_active={{ bg: 'gray.800' }}
+								/>
+							}
 						/>
 						<FormErrorMessage>{errors.datetime?.message}</FormErrorMessage>
 					</FormControl>
@@ -128,11 +146,12 @@ export const EventForm: React.FC<EventFormProps> = ({ onSubmit }) => {
 										{suggestions.map((suggestion) => (
 											<Box
 												{...getSuggestionItemProps(suggestion)}
-												bg={suggestion.active ? 'black' : 'blackAlpha.500'}
+												bg={suggestion.active ? 'blue.500' : 'gray.700'}
 												p={2}
 												borderBottom='1px solid'
 												borderColor='blue.200'
 												key={suggestion.placeId}
+												color='white'
 											>
 												{suggestion.description}
 											</Box>
@@ -148,18 +167,29 @@ export const EventForm: React.FC<EventFormProps> = ({ onSubmit }) => {
 				<GridItem colSpan={{ base: 1, md: 1 }}>
 					<FormControl isInvalid={!!errors.attendees}>
 						<FormLabel htmlFor='attendees'>Number of Attendees</FormLabel>
-						<NumberInput defaultValue={0} min={0}>
-							<NumberInputField
-								id='attendees'
-								{...register('attendees')}
-								bg='gray.700'
-								color='white'
-							/>
-							<NumberInputStepper>
-								<NumberIncrementStepper />
-								<NumberDecrementStepper />
-							</NumberInputStepper>
-						</NumberInput>
+						<Controller
+							name='attendees'
+							control={control}
+							defaultValue={1}
+							render={({ field }) => (
+								<NumberInput
+									{...field}
+									id='attendees'
+									min={1}
+									onChange={(value) => field.onChange(Number(value))}
+									value={field.value}
+									bg='gray.700'
+									color='white'
+								>
+									<NumberInputField />
+									<NumberInputStepper>
+										<NumberIncrementStepper />
+										<NumberDecrementStepper />
+									</NumberInputStepper>
+								</NumberInput>
+							)}
+						/>
+
 						<FormErrorMessage>{errors.attendees?.message}</FormErrorMessage>
 					</FormControl>
 				</GridItem>

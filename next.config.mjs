@@ -22,6 +22,8 @@ const config = {
     domains: [
       // Your other allowed domains
       "images.clerk.dev",
+      "www.gravatar.com",
+      'stamen-tiles.a.ssl.fastly.net',
     ],
   },
 };

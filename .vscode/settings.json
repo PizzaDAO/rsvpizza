@@ -1,13 +1,15 @@
 {
 	"cSpell.words": [
 		"Authed",
-		"Chakra",
+		"chakra",
+		"datepicker",
 		"datetime",
+		"fastly",
 		"geocode",
 		"hookform",
 		"nextjs",
-		"sesh",
-		"TRPC",
-		"Upstash"
+		"superjson",
+		"tanstack",
+		"TRPC"
 	]
 }

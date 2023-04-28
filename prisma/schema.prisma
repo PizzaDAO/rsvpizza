@@ -11,17 +11,61 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum ROLE {
+  ADMIN
+  USER
+}
+
+enum TOPPING_CATEGORY {
+  MEAT
+  NON_MEAT
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  role      ROLE     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Event {
   id          String   @id @default(cuid())
-  creatorId   String
+  userId      String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   name        String
   datetime    DateTime
   location    String   @default("")
-  slug        String   @unique @db.VarChar(200)
+  slug        String   @unique @db.VarChar(21)
   attendees   Int
   description String   @db.VarChar(255)
 
-  @@index([creatorId])
+  @@index([userId])
+}
+
+model Order {
+  id                    String   @id @default(cuid())
+  eventId               String
+  userId                String?
+  name                  String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  dietaryRestrictionIds Json
+  toppingIds            Json
+  sliceQuantity         Int
+
+  @@index([eventId])
+  @@index([userId])
+}
+
+model Topping {
+  id       Int              @id @default(autoincrement())
+  name     String
+  category TOPPING_CATEGORY @default(NON_MEAT)
+}
+
+model DietaryRestriction {
+  id   Int    @id @default(autoincrement())
+  name String
 }
