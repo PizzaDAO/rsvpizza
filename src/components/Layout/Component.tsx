@@ -1,16 +1,14 @@
-import { Container } from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react';
 import styles from '../../pages/index.module.css';
 import { FC, PropsWithChildren } from 'react';
+import { AppBar } from '../AppBar';
 
 const Layout: FC<PropsWithChildren> = ({ children }) => {
 	return (
-		<Container
-			className={styles.main}
-			alignContent={'space-between'}
-			maxW={'100%'}
-		>
-			{children}
-		</Container>
+		<Box className={styles.main} width='100%' flexDirection='column'>
+			<AppBar />
+			<Box flexGrow={1}>{children}</Box>
+		</Box>
 	);
 };
 
