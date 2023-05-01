@@ -25,8 +25,8 @@ export const EventList: FC<EventListProps> = ({
 				events.map((event) => (
 					<Box
 						key={event.id}
-						bgColor={'blue.500'}
-						w={'61.8%'}
+						bgColor={'#181726'}
+						w={'200%'}
 						borderRadius={'md'}
 						borderWidth={'1px'}
 						borderColor={'gray.300'}

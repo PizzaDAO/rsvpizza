@@ -55,7 +55,7 @@ export const CreateEventWizard: React.FC<EventFormProps> = ({ onSubmit }) => {
 			position={'relative'}
 			flexDirection={'row'}
 			justifyContent={'flex-start'}
-			bgColor={'red.500'}
+			bgColor={'#181726'}
 			w={'500px'}
 		>
 			<img
@@ -64,7 +64,7 @@ export const CreateEventWizard: React.FC<EventFormProps> = ({ onSubmit }) => {
 				width={'128px'}
 				height={'128px'}
 			/>
-			<Box as='form' onSubmit={handleSubmit(onSubmit)}>
+			<Box as='form' bgColor={'#181726'} onSubmit={handleSubmit(onSubmit)}>
 				<VStack spacing={4}>
 					<FormControl isInvalid={!!errors.name}>
 						<FormLabel htmlFor='name'>Event Name</FormLabel>
