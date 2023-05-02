@@ -63,7 +63,7 @@ export const CreateEvent: FC<CreateEventProps> = ({ profileImageUrl }) => {
 			justifyContent={'flex-start'}
 			borderRadius='md'
 			bgColor={'#181726'}
-			w={['100%', '100%', '65em']}
+			w={['100%', '100%', '1000px']}
 			padding={'20px'}
 			mx='auto'
 		>

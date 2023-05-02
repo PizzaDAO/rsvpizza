@@ -91,7 +91,12 @@ export const CreateOrder: FC<CreateOrderProps> = ({
 
 	console.log('errors', errors);
 	return (
-		<Box as='form' onSubmit={handleSubmit(onSubmit)}>
+		<Box
+			width={'1000px'}
+			bg={'#181726'}
+			as='form'
+			onSubmit={handleSubmit(onSubmit)}
+		>
 			<VStack spacing={4} alignItems='stretch'>
 				<FormControl id='name' isInvalid={!!errors.name}>
 					<FormLabel>Name (optional)</FormLabel>
@@ -124,6 +129,7 @@ export const CreateOrder: FC<CreateOrderProps> = ({
 												value={topping.id}
 												key={topping.id}
 												isChecked={getValues().toppingIds.includes(topping.id)}
+												padding={'5px'}
 											>
 												{topping.name}
 											</Checkbox>
@@ -156,6 +162,7 @@ export const CreateOrder: FC<CreateOrderProps> = ({
 												isChecked={getValues().dietaryRestrictionIds.includes(
 													dietaryRestriction.id
 												)}
+												padding={'5px'}
 											>
 												{dietaryRestriction.name}
 											</Checkbox>

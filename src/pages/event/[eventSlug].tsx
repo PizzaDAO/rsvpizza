@@ -66,12 +66,20 @@ const EventPage: NextPage = () => {
 				/>
 			</Head>
 			<Flex
+				className='BALLZ'
 				direction='column'
 				minHeight='100vh'
+				width={'1000px'}
+				bg={'#181726'}
 				paddingTop={6}
 				paddingBottom={6}
 			>
-				<VStack spacing={6} alignItems='center' flexGrow={1}>
+				<VStack
+					bg={'#181726'}
+					spacing={'50px'}
+					alignItems='center'
+					flexGrow={1}
+				>
 					<EventList
 						events={[event]}
 						isLoading={eventIsLoading}

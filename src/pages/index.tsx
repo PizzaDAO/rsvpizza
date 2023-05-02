@@ -59,6 +59,7 @@ const Home: NextPage = () => {
 				minHeight='100vh'
 				paddingTop={6}
 				paddingBottom={6}
+				width={'1000px'}
 			>
 				{user.isSignedIn ? (
 					<>
