@@ -20,13 +20,13 @@ export const EventList: FC<EventListProps> = ({
 		return <div>No events found</div>;
 
 	return (
-		<VStack spacing={6} alignItems='center' flexGrow={1}>
+		<VStack spacing={6} alignItems='center' w={'100%'}>
 			{events &&
 				events.map((event) => (
 					<Box
 						key={event.id}
-						bgColor={'blue.500'}
-						w={'61.8%'}
+						bgColor={'#181726'}
+						w={'100%'}
 						borderRadius={'md'}
 						borderWidth={'1px'}
 						borderColor={'gray.300'}

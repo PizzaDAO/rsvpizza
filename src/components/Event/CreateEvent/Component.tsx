@@ -61,25 +61,40 @@ export const CreateEvent: FC<CreateEventProps> = ({ profileImageUrl }) => {
 			position={'relative'}
 			flexDirection={['column', 'column', 'row']}
 			justifyContent={'flex-start'}
-			bgColor={'blue.500'}
-			w={['100%', '100%', '65em']}
+			borderRadius='md'
+			bgColor={'#181726'}
+			w={['100%', '100%', '1000px']}
+			padding={'20px'}
 			mx='auto'
 		>
 			<VStack spacing={6} ref={vStackRef}>
-				<Flex justifyContent={'space-between'} alignItems='center' w='100%'>
+				<Flex
+					justifyContent={'space-between'}
+					bgColor={'#675cff'}
+					borderRadius='md'
+					padding={'20px'}
+					alignItems='center'
+					w='100%'
+				>
 					<Image
 						src={profileImageUrl}
 						alt={'Profile image'}
 						width={128}
 						height={128}
 					/>
-					<Heading>Create Event</Heading>
+					<Heading as='h1' size='3xl'>
+						Create Event
+					</Heading>
 				</Flex>
 				<Box width='100%'>
 					<EventForm onSubmit={handleFormSubmit} />
 				</Box>
 			</VStack>
-			<Box height={vStackHeight > 0 ? `${vStackHeight}px` : 'auto'}>
+			<Box
+				w='50%'
+				borderRadius='md'
+				height={vStackHeight > 0 ? `${vStackHeight}px` : 'auto'}
+			>
 				<MapWrapper lat={51.505} lng={-0.09} />
 			</Box>
 		</Flex>

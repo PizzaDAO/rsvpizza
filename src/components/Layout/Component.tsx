@@ -7,7 +7,9 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
 	return (
 		<Box className={styles.main} width='100%' flexDirection='column'>
 			<AppBar />
-			<Box flexGrow={1}>{children}</Box>
+			<Box bgColor={'#181726'} flexGrow={1}>
+				{children}
+			</Box>
 		</Box>
 	);
 };
